@@ -2,7 +2,7 @@
 
 An independent extension and enhanced implementation of **μFé-8** 8-bit microcontroller architecture. This project serves as a practical link between fundamental concepts of **Digital Systems** and **Microprocessor Systems**.
 
-> **Credits & Acknowledgments**: This project is based on the original specification and open-source architecture created by [@dccafe in the uFe8 project](https://github.com/dccafe/uFe8)[cite: 1].
+> **Credits & Acknowledgments**: This project is based on the original specification and open-source architecture created by [@dccafe in the uFe8 project](https://github.com/dccafe/uFe8).
 
 ---
 
