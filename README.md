@@ -6,7 +6,7 @@ Uma implementação e extensão independente da arquitetura do processador de 8 
 
 ---
 
-## 📌 Visão Geral da Arquitetura
+## Visão Geral da Arquitetura
 
 O **μFé-8** é um microcontrolador de 8 bits inspirado na arquitetura simplificada do MSP430.
 
@@ -28,9 +28,9 @@ O **μFé-8** é um microcontrolador de 8 bits inspirado na arquitetura simplifi
 
 ---
 
-## 🚀 Extensão Proposta: Suporte a Sub-rotinas (Pilha, `CALL` e `RET`)
+## Extensão Proposta: Suporte a Sub-rotinas (Pilha, `CALL` e `RET`)
 
-Nesta versão customizada, a arquitetura original foi estendida para suportar **chamadas de funções/sub-rotinas** nativas através de uma pilha (*Stack*) na memória RAM.
+Nesta versão, a arquitetura original foi estendida para suportar **chamadas de funções/sub-rotinas** nativas através de uma pilha (*Stack*) na memória RAM.
 
 ### 1. Ponteiro de Pilha (`SP`)
 * Registrador de 8 bits inicializado no topo da memória RAM (`0xBF`).
