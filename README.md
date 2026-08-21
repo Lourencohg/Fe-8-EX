@@ -1,78 +1,79 @@
-# μFé-8 EX Core (Extended Architecture)
+# μFé-8 EX (Extended Microcontroller Architecture)
 
-Uma implementação e extensão independente da arquitetura do processador de 8 bits **μFé-8**. O projeto serve como um elo entre conceitos de **Sistemas Digitais** e **Sistemas Microprocessados**.
+An independent extension and enhanced implementation of **μFé-8** 8-bit microcontroller architecture. This project serves as a practical link between fundamental concepts of **Digital Systems** and **Microprocessor Systems**.
 
-> **Créditos e Referência**: Este projeto é baseado na especificação e arquitetura original criada por [@dccafe no projeto uFe8](https://github.com/dccafe/uFe8).
+> **Credits & Acknowledgments**: This project is based on the original specification and open-source architecture created by [@dccafe in the uFe8 project](https://github.com/dccafe/uFe8)[cite: 1].
 
 ---
 
-## Visão Geral da Arquitetura
+## 📌 Architecture Overview
 
-O **μFé-8** é um microcontrolador de 8 bits inspirado na arquitetura simplificada do MSP430.
+The **μFé-8 EX** is an 8-bit microcontroller inspired by a simplified subset of the MSP430 architecture.
 
-* **Barramento de Dados e Endereços**: 8 bits
-* **Registradores de Uso Geral**: `R0`, `R1`, `R2`, `R3`
-* **Registradores Especiais Internos**:
-  * `PC` (Program Counter)
-  * `IR` (Instruction Register)
-  * `CTE` (Constant Register)
-  * **`SP` (Stack Pointer)** *(Extensão desta versão)*
+* **Data & Address Bus Width**: 8-bit
+* **General-Purpose Registers**: `R0`, `R1`, `R2`, `R3`
+* **Internal Special Registers**:
+  * `PC` (Program Counter)[cite: 1]
+  * `IR` (Instruction Register)[cite: 1]
+  * `CTE` (Constant Register)[cite: 1]
+  * **`SP` (Stack Pointer)** *(Extension added in this version)*
 
-### 🗺️ Mapa de Memória
+### 🗺️ Memory Map
 
-| Faixa de Endereços | Região | Descrição |
+| Address Range | Region | Description |
 |---|---|---|
-| `0x00` - `0x7F` | **ROM** | Instruções do programa e constantes |
-| `0x80` - `0xBF` | **RAM** | Variáveis de dados e Pilha (Stack) |
-| `0xC0` - `0xFF` | **Periféricos** | E/S e módulos de hardware (GPIO, etc.) |
+| `0x00` - `0x7F` | **ROM** | Program instructions and constants[cite: 1] |
+| `0x80` - `0xBF` | **RAM** | General data variables and System Stack[cite: 1] |
+| `0xC0` - `0xFF` | **Peripherals** | Hardware I/O and custom peripherals (GPIO, Timers)[cite: 1] |
 
 ---
 
-## Extensão Proposta: Suporte a Sub-rotinas (Pilha, `CALL` e `RET`)
+## 🚀 Architectural Extension: Subroutine & Stack Support (`CALL` / `RET`)
 
-Nesta versão, a arquitetura original foi estendida para suportar **chamadas de funções/sub-rotinas** nativas através de uma pilha (*Stack*) na memória RAM.
+In this extended version, the original architecture was upgraded to natively support **subroutine/function calls** using a hardware-managed stack located in RAM.
 
-### 1. Ponteiro de Pilha (`SP`)
-* Registrador de 8 bits inicializado no topo da memória RAM (`0xBF`).
-* Cresce no sentido inverso da memória (decrementa na escrita/empilhamento e incrementa na leitura/desempilhamento).
+### 1. Stack Pointer (`SP`)
+* An 8-bit register initialized at the top of RAM (`0xBF`)[cite: 1].
+* Decrements on push operations (saving context) and increments on pop operations (restoring context).
 
-### 2. Novas Instruções
+### 2. New Subroutine Instructions
 
-| Mnemônico | Opcode (Sugerido) | Operação | Descrição |
+| Mnemonic | Opcode Format | Operation | Description |
 |---|---|---|---|
-| `CALL label` | `111 1 xx 100` | `RAM[SP] <= PC + 2`<br>`SP <= SP - 1`<br>`PC <= label` | Salva o endereço de retorno na pilha e salta para a sub-rotina. |
-| `RET` | `111 1 xx 101` | `SP <= SP + 1`<br>`PC <= RAM[SP]` | Desempilha o endereço de retorno e retorna da sub-rotina. |
+| `CALL label` | `111 1 xx 100` | `RAM[SP] <= PC + 2`<br>`SP <= SP - 1`<br>`PC <= label` | Pushes the return address onto the stack and jumps to the subroutine. |
+| `RET` | `111 1 xx 101` | `SP <= SP + 1`<br>`PC <= RAM[SP]` | Pops the return address from the stack and returns to the main execution flow. |
 
 ---
 
-## 🏗️ Conjunto de Instruções da ISA Base
+## 🏗️ Base Instruction Set Architecture (ISA)
 
-As instruções ocupam 1 byte, podendo ter 1 byte adicional em caso de uso de constante imediata (`#i`).
+Instructions are encoded in 8 bits (1 byte)[cite: 1]. An optional 8-bit immediate byte follows the instruction if the constant flag (`cte`) is set to `1`[cite: 1].
 
-| Opcode | C | SRC | DST | Mnemônico | Detalhes |
+| Opcode | C | SRC | DST | Mnemonic | Details |
 |---|---|---|---|---|---|
-| `000` | c | ss | dd | `ADD Rs/#i, Rd` | `[Rs\|#i] + Rd => Rd` |
-| `001` | c | ss | dd | `AND Rs/#i, Rd` | `[Rs\|#i] & Rd => Rd` |
-| `010` | c | ss | dd | `XOR Rs/#i, Rd` | `[Rs\|#i] ^ Rd => Rd` |
-| `011` | c | ss | dd | `OR  Rs/#i, Rd` | `[Rs\|#i] \| Rd => Rd` |
-| `100` | c | ss | dd | `LD  @Rs/@i, Rd` | `@Rs/@i => Rd` |
-| `101` | c | ss | dd | `ST  Rs/#i, @Rd` | `Rs/#i => @Rd` |
-| `110` | c | ss | dd | `MOV Rs/#i, Rd` | `[Rs\|#i] => Rd` |
-| `111` | 1 | xx | 00 | `JC label` | `PC <= label` se `C == 1` |
-| `111` | 1 | xx | 01 | `JZ label` | `PC <= label` se `Z == 1` |
-| `111` | 1 | xx | 10 | `JNZ label` | `PC <= label` se `Z == 0` |
-| `111` | 1 | xx | 11 | `JMP label` | `PC <= label` |
+| `000` | c | ss | dd | `ADD Rs/#i, Rd` | `[Rs\|#i] + Rd => Rd`[cite: 1] |
+| `001` | c | ss | dd | `AND Rs/#i, Rd` | `[Rs\|#i] & Rd => Rd`[cite: 1] |
+| `010` | c | ss | dd | `XOR Rs/#i, Rd` | `[Rs\|#i] ^ Rd => Rd`[cite: 1] |
+| `011` | c | ss | dd | `OR  Rs/#i, Rd` | `[Rs\|#i] \| Rd => Rd`[cite: 1] |
+| `100` | c | ss | dd | `LD  @Rs/@i, Rd` | `@Rs/@i => Rd`[cite: 1] |
+| `101` | c | ss | dd | `ST  Rs/#i, @Rd` | `Rs/#i => @Rd`[cite: 1] |
+| `110` | c | ss | dd | `MOV Rs/#i, Rd` | `[Rs\|#i] => Rd`[cite: 1] |
+| `111` | 1 | xx | 00 | `JC label` | `PC <= label` if `C == 1`[cite: 1] |
+| `111` | 1 | xx | 01 | `JZ label` | `PC <= label` if `Z == 1`[cite: 1] |
+| `111` | 1 | xx | 10 | `JNZ label` | `PC <= label` if `Z == 0`[cite: 1] |
+| `111` | 1 | xx | 11 | `JMP label` | `PC <= label`[cite: 1] |
 
 ---
 
-## 🛠️ Organização do Repositório
+## 🛠️ Repository Structure
 
 ```text
-.
-├── docs/               # Especificações técnicas e esquemáticos da FSM
-├── logisim/            # Circuitos e simulações (.circ)
-├── rtl/                # Códigos em Verilog/SystemVerilog (opcional)
-├── tools/              # Assembler em Python para gerar arquivos HEX para a ROM
+ufe8-ex/
+├── docs/               # Technical specifications and Control Unit (FSM) state diagrams
+├── logisim/            # Logisim/Digital schematic circuit designs (.circ)
+├── rtl/                # SystemVerilog/VHDL design modules (optional)
+├── sim/                # Simulation testbenches
+├── tools/              # Custom Python Assembler to generate ROM .hex files
 ├── .gitignore
 ├── LICENSE
 └── README.md
