@@ -13,18 +13,18 @@ The **μFé-8 EX** is an 8-bit microcontroller inspired by a simplified subset o
 * **Data & Address Bus Width**: 8-bit
 * **General-Purpose Registers**: `R0`, `R1`, `R2`, `R3`
 * **Internal Special Registers**:
-  * `PC` (Program Counter)[cite: 1]
-  * `IR` (Instruction Register)[cite: 1]
-  * `CTE` (Constant Register)[cite: 1]
+  * `PC` (Program Counter)
+  * `IR` (Instruction Register)
+  * `CTE` (Constant Register)
   * **`SP` (Stack Pointer)** *(Extension added in this version)*
 
 ### 🗺️ Memory Map
 
 | Address Range | Region | Description |
 |---|---|---|
-| `0x00` - `0x7F` | **ROM** | Program instructions and constants[cite: 1] |
-| `0x80` - `0xBF` | **RAM** | General data variables and System Stack[cite: 1] |
-| `0xC0` - `0xFF` | **Peripherals** | Hardware I/O and custom peripherals (GPIO, Timers)[cite: 1] |
+| `0x00` - `0x7F` | **ROM** | Program instructions and constants |
+| `0x80` - `0xBF` | **RAM** | General data variables and System Stack |
+| `0xC0` - `0xFF` | **Peripherals** | Hardware I/O and custom peripherals (GPIO, Timers) |
 
 ---
 
@@ -33,7 +33,7 @@ The **μFé-8 EX** is an 8-bit microcontroller inspired by a simplified subset o
 In this extended version, the original architecture was upgraded to natively support **subroutine/function calls** using a hardware-managed stack located in RAM.
 
 ### 1. Stack Pointer (`SP`)
-* An 8-bit register initialized at the top of RAM (`0xBF`)[cite: 1].
+* An 8-bit register initialized at the top of RAM (`0xBF`).
 * Decrements on push operations (saving context) and increments on pop operations (restoring context).
 
 ### 2. New Subroutine Instructions
@@ -47,21 +47,21 @@ In this extended version, the original architecture was upgraded to natively sup
 
 ## 🏗️ Base Instruction Set Architecture (ISA)
 
-Instructions are encoded in 8 bits (1 byte)[cite: 1]. An optional 8-bit immediate byte follows the instruction if the constant flag (`cte`) is set to `1`[cite: 1].
+Instructions are encoded in 8 bits (1 byte). An optional 8-bit immediate byte follows the instruction if the constant flag (`cte`) is set to `1`.
 
 | Opcode | C | SRC | DST | Mnemonic | Details |
 |---|---|---|---|---|---|
-| `000` | c | ss | dd | `ADD Rs/#i, Rd` | `[Rs\|#i] + Rd => Rd`[cite: 1] |
-| `001` | c | ss | dd | `AND Rs/#i, Rd` | `[Rs\|#i] & Rd => Rd`[cite: 1] |
-| `010` | c | ss | dd | `XOR Rs/#i, Rd` | `[Rs\|#i] ^ Rd => Rd`[cite: 1] |
-| `011` | c | ss | dd | `OR  Rs/#i, Rd` | `[Rs\|#i] \| Rd => Rd`[cite: 1] |
-| `100` | c | ss | dd | `LD  @Rs/@i, Rd` | `@Rs/@i => Rd`[cite: 1] |
-| `101` | c | ss | dd | `ST  Rs/#i, @Rd` | `Rs/#i => @Rd`[cite: 1] |
-| `110` | c | ss | dd | `MOV Rs/#i, Rd` | `[Rs\|#i] => Rd`[cite: 1] |
-| `111` | 1 | xx | 00 | `JC label` | `PC <= label` if `C == 1`[cite: 1] |
-| `111` | 1 | xx | 01 | `JZ label` | `PC <= label` if `Z == 1`[cite: 1] |
-| `111` | 1 | xx | 10 | `JNZ label` | `PC <= label` if `Z == 0`[cite: 1] |
-| `111` | 1 | xx | 11 | `JMP label` | `PC <= label`[cite: 1] |
+| `000` | c | ss | dd | `ADD Rs/#i, Rd` | `[Rs\|#i] + Rd => Rd` |
+| `001` | c | ss | dd | `AND Rs/#i, Rd` | `[Rs\|#i] & Rd => Rd` |
+| `010` | c | ss | dd | `XOR Rs/#i, Rd` | `[Rs\|#i] ^ Rd => Rd` |
+| `011` | c | ss | dd | `OR  Rs/#i, Rd` | `[Rs\|#i] \| Rd => Rd`|
+| `100` | c | ss | dd | `LD  @Rs/@i, Rd` | `@Rs/@i => Rd` |
+| `101` | c | ss | dd | `ST  Rs/#i, @Rd` | `Rs/#i => @Rd` |
+| `110` | c | ss | dd | `MOV Rs/#i, Rd` | `[Rs\|#i] => Rd` |
+| `111` | 1 | xx | 00 | `JC label` | `PC <= label` if `C == 1` |
+| `111` | 1 | xx | 01 | `JZ label` | `PC <= label` if `Z == 1` |
+| `111` | 1 | xx | 10 | `JNZ label` | `PC <= label` if `Z == 0` |
+| `111` | 1 | xx | 11 | `JMP label` | `PC <= label` |
 
 ---
 
